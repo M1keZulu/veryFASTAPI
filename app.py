@@ -4,7 +4,6 @@ from openpyxl import load_workbook
 import urllib
 
 app = Flask(__name__)
-app.run(host="0.0.0.0")
 
 @app.route('/details/<string:course>')
 def details(course):
