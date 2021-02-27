@@ -6,7 +6,8 @@ import urllib
 import json
 
 app = Flask(__name__)
-app.run(threaded=True)
+if __name__ == '__main__':
+    app.run(threaded=True)
 
 parser = reqparse.RequestParser()
 parser.add_argument('day', type=str, required=False)
