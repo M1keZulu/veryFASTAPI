@@ -53,7 +53,6 @@ def details(course):
     return jsonify(r)
 @app.route('/search')
 def search():
-    wb = load_workbook(filename='timetable.xlsx')
     program = str(parser.parse_args().get('program', None)).upper()
     section = str(parser.parse_args().get('section', None)).upper()
     day = str(parser.parse_args().get('day', None)).upper()
