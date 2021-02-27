@@ -1,9 +1,19 @@
 from flask import Flask, jsonify, render_template
+from flask_restful import reqparse
 import re
 from openpyxl import load_workbook
 import urllib
 
 app = Flask(__name__)
+
+parser = reqparse.RequestParser()
+parser.add_argument('day', type=str, required=False)
+parser.add_argument('program', type=str, required=False)
+parser.add_argument('section', type=str, required=False)
+parser.add_argument('course', type=str, required=False)
+parser.add_argument('slot', type=int, required=False)
+parser.add_argument('teacher', type=str, required=False)
+
 
 def time_setter(t):
     if(t==1):
@@ -47,7 +57,49 @@ def details(course):
         if x["Course Name"] == course:
             r.append(x)
     return jsonify(r)
+@app.route('/search')
+def search():
+    wb = load_workbook(filename='timetable.xlsx')
+    program = str(parser.parse_args().get('program', None)).upper()
+    section = str(parser.parse_args().get('section', None)).upper()
+    day = str(parser.parse_args().get('day', None)).upper()
+    teacher = str(parser.parse_args().get('teacher', None)).upper()
+    slot = parser.parse_args().get('slot', None)
+    course = str(parser.parse_args().get('course', None)).upper()
+    
+    s=[]
+    if program!="NONE":
+        s.append(program)
+    if course!="NONE":
+        s.append(course)
+    if teacher!="NONE":
+        s.append(teacher)
+    if section!="NONE":
+        s.append(section)
 
+    l = []
+    for sheet in wb.worksheets:
+        if sheet.title=="Monday" or sheet.title=="Tuesday" or sheet.title=="Wednesday" or sheet.title=="Thursday" or sheet.title=="Friday" or sheet.title=="Saturday" or sheet.title=="Sunday":
+            for i in range(1, sheet.max_row + 1):
+                for j in range(sheet.max_column):
+                    if (str(sheet[i][j].value).find("BCS") != -1 or str(sheet[i][j].value).find("BDS") != -1 or str(sheet[i][j].value).find("BAI") != -1 or str(sheet[i][j].value).find("BSE") != -1):
+                        l.append({"Course Name": (" ".join(sheet[i][j].value.split()).upper().replace("/", "&")), "Day": (sheet.title.upper()), "Venue: ": (sheet[i][0].value.upper()), "Slot": (sheet[2][j].value), "Timings": time_setter((sheet[2][j].value))})
+                        if str(sheet[i][j].value).find("Lab") != -1 or str(sheet[i][j].value).find("lab") != -1:
+                            l.append({"Course Name": (" ".join(sheet[i][j].value.split()).upper().replace("/", "&")), "Day": (sheet.title.upper()), "Venue: ": (sheet[i][0].value.upper()), "Slot": (sheet[2][j].value)+1, "Timings": time_setter((sheet[2][j].value)+1)})
+                            l.append({"Course Name": (" ".join(sheet[i][j].value.split()).upper().replace("/", "&")), "Day": (sheet.title.upper()), "Venue: ": (sheet[i][0].value.upper()), "Slot": (sheet[2][j].value)+2, "Timings": time_setter((sheet[2][j].value)+2)})
+    r = []
+    for x in l:
+        print(s)
+        print(day)
+        print(slot)
+        if day!="NONE" and x["Day"]!=day:
+            continue
+        if slot is not None and x["Slot"]!=slot:
+            continue
+        if all(y in x["Course Name"] for y in s):
+            r.append(x)
+        
+    return jsonify(r)
 
 @app.route('/names')
 def names():
