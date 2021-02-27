@@ -6,6 +6,7 @@ import urllib
 import json
 
 app = Flask(__name__)
+app.run(threaded=True)
 
 parser = reqparse.RequestParser()
 parser.add_argument('day', type=str, required=False)
@@ -40,7 +41,6 @@ def time_setter(t):
 @app.route('/details/<string:course>')
 def details(course):
     course = urllib.parse.unquote_plus(course)
-    wb = load_workbook(filename='timetable.xlsx')
     l = []
     with open("data.txt", "r") as f:
         l = json.load(f)
