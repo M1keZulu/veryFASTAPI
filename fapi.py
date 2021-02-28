@@ -5,10 +5,16 @@ import uvicorn
 import json
 from typing import Optional
 import urllib
+from fastapi.middleware.cors import CORSMiddleware
 
 #Deploy
 
 app=FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+)
+
 templates = Jinja2Templates(directory="templates/")
 
 @app.get('/details/{course}')
