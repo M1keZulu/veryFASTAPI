@@ -47,7 +47,7 @@ async def nav(request: Request):
     course_names = [[]]
     for x in l:
         if x["Course Name"] not in course_names:
-            course_names.append([x["Course Name"], "details/" + x["Course Name"]])
+            course_names.append([x["Course Name"], "courses/" + x["Course Name"]])
     
     return templates.TemplateResponse("index.html", {"request": request, "course_names": course_names})
 
