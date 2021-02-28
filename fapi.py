@@ -17,7 +17,7 @@ app.add_middleware(
 
 templates = Jinja2Templates(directory="templates/")
 
-@app.get('/details/{course}')
+@app.get('/courses/{course}')
 async def alpha(course: str):
     with open("data.txt", "r") as f:
         l = json.load(f)
@@ -28,7 +28,7 @@ async def alpha(course: str):
             r.append(x)
     return r
 
-@app.get('/names')
+@app.get('/courses')
 def names():
     with open("data.txt", "r") as f:
         l = json.load(f)
