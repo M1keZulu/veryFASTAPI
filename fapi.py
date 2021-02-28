@@ -73,5 +73,6 @@ async def search(course: Optional[str]=None, section: Optional[str]=None, day: O
             continue
         if all(y in x["Course Name"] for y in s):
             r.append(x)
+    r = sorted(r, key=lambda k: k['Slot']) 
     return r
     
